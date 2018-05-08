@@ -32,17 +32,29 @@ if ( !defined( 'ABSPATH' ) ) {
 }
 
 define( 'AFFILIATES_CALDERA_FORMS_PLUGIN_VERSION', '1.0.0' );
+define( 'AFFILIATES_CALDERA_FORMS_PLUGIN_DOMAIN', 'affiliates-caldera-forms' );
 
 /**
  * Plugin boot.
  */
 function affiliates_caldera_forms_plugins_loaded() {
-	if ( class_exists( 'Affiliates' ) ) {
-		define( 'AFFILIATES_CALDERA_FORMS_DIR', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
-		define( 'AFFILIATES_CALDERA_FORMS_LIB', AFFILIATES_CALDERA_FORMS_DIR . '/lib' );
-		define( 'AFFILIATES_CALDERA_FORMS_PLUGIN_URL', plugins_url( 'affiliates-caldera-forms' ) );
-		require_once AFFILIATES_CALDERA_FORMS_LIB . '/class-affiliates-cf-admin.php';
-		require_once AFFILIATES_CALDERA_FORMS_LIB . '/class-affiliates-cf-referrals.php';
+	if (
+		defined( 'AFFILIATES_EXT_VERSION' ) &&
+		version_compare( AFFILIATES_EXT_VERSION, '3.0.0' ) >= 0 &&
+		class_exists( 'Affiliates_Referral' ) &&
+		(
+			!defined( 'Affiliates_Referral::DEFAULT_REFERRAL_CALCULATION_KEY' ) ||
+			!get_option( Affiliates_Referral::DEFAULT_REFERRAL_CALCULATION_KEY, null )
+		)
+	) {
+		$lib = '/lib';
+	} else {
+		$lib = '/lib-2';
 	}
+	define( 'AFFILIATES_CALDERA_FORMS_DIR', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
+	define( 'AFFILIATES_CALDERA_FORMS_LIB', AFFILIATES_CALDERA_FORMS_DIR . $lib );
+	define( 'AFFILIATES_CALDERA_FORMS_PLUGIN_URL', plugins_url( 'affiliates-caldera-forms' ) );
+	require_once AFFILIATES_CALDERA_FORMS_LIB . '/class-affiliates-cf-admin.php';
+	require_once AFFILIATES_CALDERA_FORMS_LIB . '/class-affiliates-cf-referrals.php';
 }
 add_action( 'plugins_loaded', 'affiliates_caldera_forms_plugins_loaded' );
