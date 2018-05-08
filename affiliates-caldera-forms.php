@@ -47,12 +47,12 @@ function affiliates_caldera_forms_plugins_loaded() {
 			!get_option( Affiliates_Referral::DEFAULT_REFERRAL_CALCULATION_KEY, null )
 		)
 	) {
-		$lib = '/lib';
+		define ( 'ACF_LIB', 'lib' );
 	} else {
-		$lib = '/lib-2';
+		define ( 'ACF_LIB', 'lib-2' );
 	}
 	define( 'AFFILIATES_CALDERA_FORMS_DIR', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
-	define( 'AFFILIATES_CALDERA_FORMS_LIB', AFFILIATES_CALDERA_FORMS_DIR . $lib );
+	define( 'AFFILIATES_CALDERA_FORMS_LIB', AFFILIATES_CALDERA_FORMS_DIR . '/lib' );
 	define( 'AFFILIATES_CALDERA_FORMS_PLUGIN_URL', plugins_url( 'affiliates-caldera-forms' ) );
 	require_once AFFILIATES_CALDERA_FORMS_LIB . '/class-affiliates-cf-admin.php';
 	require_once AFFILIATES_CALDERA_FORMS_LIB . '/class-affiliates-cf-referrals.php';
