@@ -100,14 +100,7 @@ class Affiliates_Cf_Form_Settings {
 		$output = '';
 
 		$output .= '<div class="caldera-config-group">';
-		//$output .= '<label>';
-		//$output .= esc_html__( 'Referrals', 'affiliates-caldera-forms' );
-		//$output .= '</label>';
 		$output .= '<div class="caldera-config-field">';
-		//$output .= '<label>';
-		//$output .= '<input name="config[affiliates_cf][enable_form_referrals]" type="checkbox" ' . ( $enable_form_referrals ? 'checked="checked" ' : '' ) . '/>';
-		//$output .= esc_html__( 'Enable referrals', 'affiliates-caldera-forms' );
-		//$output .= '</label>';
 		$output .= '<p class="description">';
 		$output .= esc_html__( 'Referral Commissions for this form can be set through Affiliates > Rates.', 'affiliates-caldera-forms' );
 		$output .= '</p>';
