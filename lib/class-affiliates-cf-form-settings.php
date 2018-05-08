@@ -40,16 +40,17 @@ class Affiliates_Cf_Form_Settings {
 	/**
 	 * Renders Affiliates settings form
 	 *
-	 * @param string $id
+	 * @param string $id form id
 	 */
 	public static function render_form( $id ) {
-		$default_status = get_option( 'aff_default_referral_status', AFFILIATES_REFERRAL_STATUS_ACCEPTED );
+		/*$default_status = get_option( 'aff_default_referral_status', AFFILIATES_REFERRAL_STATUS_ACCEPTED );
 		$options = get_option( $id , array() );
 
 		$enable_form_referrals = isset( $options['affiliates_cf']['enable_form_referrals'] ) ? $options['affiliates_cf']['enable_form_referrals'] : false;
-		$referral_status = isset( $options['affiliates_cf']['referral_status' ] ) ? $options['affiliates_cf']['referral_status'] : $default_status;
-		$referral_amount = isset( $options['affiliates_cf']['referral_amount' ] ) ? $options['affiliates_cf']['referral_amount'] : '';
-		$referral_rate = isset( $options['affiliates_cf']['referral_rate'] ) ? $options['affiliates_cf']['referral_rate'] : '';
+		$referral_status       = isset( $options['affiliates_cf']['referral_status' ] ) ? $options['affiliates_cf']['referral_status'] : $default_status;
+		$referral_amount       = isset( $options['affiliates_cf']['referral_amount' ] ) ? $options['affiliates_cf']['referral_amount'] : '';
+		$referral_rate         = isset( $options['affiliates_cf']['referral_rate'] ) ? $options['affiliates_cf']['referral_rate'] : '';
+		$referral_rate_field   = isset( $options['affiliates_cf']['referral_rate_field'] ) ? $options['affiliates_cf']['referral_rate_field'] : '';
 
 		// referral status
 		$status_descriptions = array(
@@ -69,81 +70,52 @@ class Affiliates_Cf_Form_Settings {
 		}
 		$status_select .= '</select>';
 
-		// datainput-mask, based on CF API
-		$amount_mask = "'mask': '[9{*}]' ";
-		$rate_mask = "'mask': '[.9{*}]' ";
+		// referral rate amount field
+		// We use a select here, because there is no explicit total field in Caldera Forms
+		// that can be used automatically for referral rate calculations
+		$form_fields = null;
+		$caldera_form = Caldera_Forms_Forms::get_form( $id );
+		foreach ( $caldera_form['fields'] as $field_id ) {
+			if ( $field_id['type'] == 'text' || $field_id['type'] == 'number' ) {
+				$form_fields = array( $field_id['ID'] => $field_id['label'] ); 
+			}
+		}
+		if ( is_array( $form_fields ) ) {
+			$rate_field_select = '<select name="config[affiliates_cf][referral_rate_field]">';
+			foreach ( $form_fields as $field_key => $field_label ) {
+				if ( $field_key == $referral_rate_field ) {
+					$selected = 'selected="selected"';
+				} else {
+					$selected = '';
+				}
+				$rate_field_select .= "<option value='$field_key' $selected>$field_label</option>";
+			}
+			$rate_field_select .= '</select>';
+		}
 
+		// datainput-mask, field sanitization based on CF API
+		$amount_mask = "'mask': '[9{*}]' "; // integers
+		$rate_mask = "'mask': '[.9{*}]' "; // decimals
+*/
 		$output = '';
-		$output .= '<div class="caldera-config-group">';
-		$output .= '<label>';
-		$output .= esc_html__( 'Referrals', 'affiliates-caldera-forms' );
-		$output .= '</label>';
-		$output .= '<div class="caldera-config-field">';
 
-		$output .= '<label>';
-		$output .= '<input name="config[affiliates_cf][enable_form_referrals]" type="checkbox" ' . ( $enable_form_referrals ? 'checked="checked" ' : '' ) . '/>';
-		$output .= esc_html__( 'Enable referrals', 'affiliates-caldera-forms' );
-		$output .= '</label>';
+		$output .= '<div class="caldera-config-group">';
+		//$output .= '<label>';
+		//$output .= esc_html__( 'Referrals', 'affiliates-caldera-forms' );
+		//$output .= '</label>';
+		$output .= '<div class="caldera-config-field">';
+		//$output .= '<label>';
+		//$output .= '<input name="config[affiliates_cf][enable_form_referrals]" type="checkbox" ' . ( $enable_form_referrals ? 'checked="checked" ' : '' ) . '/>';
+		//$output .= esc_html__( 'Enable referrals', 'affiliates-caldera-forms' );
+		//$output .= '</label>';
 		$output .= '<p class="description">';
-		$output .= esc_html__( 'Allow affiliates to earn commissions on submissions of this form.', 'affiliates-caldera-forms' );
+		$output .= esc_html__( 'Referral Commissions for this form can be set through Affiliates > Rates.', 'affiliates-caldera-forms' );
 		$output .= '</p>';
 		$output .= '</div>';
 		$output .= '</div>';
 
-		$output .= '<div class="caldera-config-group">';
-		$output .= '<label>';
-		$output .= esc_html__( 'Referral Status', 'affiliates-caldera-forms' );
-		$output .= '</label>';
-		$output .= '<div class="caldera-config-field">';
-		$output .= '<label>';
-		$output .= $status_select;
-		$output .= '&nbsp&nbsp';
-		$output .= esc_html__( 'Referral Status', 'affiliates-caldera-forms' );
-		$output .= '</label>';
-		$output .= '<p class="description">';
-		$output .= esc_html__( 'The default status of referrals recorded for this form.', 'affiliates-caldera-forms' );
-		$output .= '</p>';
-		$output .= '</div>';
-		$output .= '</div>';
-
-		$output .= '<div class="caldera-config-group">';
-		$output .= '<label>';
-		$output .= esc_html__( 'Referral Amount', 'affiliates-caldera-forms' );
-		$output .= '</label>';
-		$output .= '<div class="caldera-config-field">';
-		$output .= '<label>';
-		$output .= '<input type="text" name="config[affiliates_cf][referral_amount]" value="' . $referral_amount . '" data-inputmask="' . $amount_mask . ' "  >';
-		$output .= '&nbsp&nbsp';
-		$output .= esc_html__( 'Referral Amount', 'affiliates-caldera-forms' );
-		$output .= '</label>';
-		$output .= '<p class="description">';
-		$output .= esc_html__( 'If a fixed amount is desired, input the referral amount to be credited for form submissions.', 'affiliates-caldera-forms' );
-		$output .= '<br />';
-		$output .= esc_html__( 'Leave this empty if a commission based on the form total should be granted.', 'affiliates-caldera-forms' );
-		$output .= '</p>';
-		$output .= '</div>';
-		$output .= '</div>';
-
-		$output .= '<div class="caldera-config-group">';
-		$output .= '<label>';
-		$output .= esc_html__( 'Referral Rate', 'affiliates-caldera-forms' );
-		$output .= '</label>';
-		$output .= '<div class="caldera-config-field">';
-		$output .= '<label>';
-		$output .= '<input type="text" name="config[affiliates_cf][referral_rate]" value="' . $referral_rate . '" data-inputmask="' . $rate_mask . ' "  >';
-		$output .= '&nbsp&nbsp';
-		$output .= esc_html__( 'Referral Rate', 'affiliates-caldera-forms' );
-		$output .= '</label>';
-		$output .= '<p class="description">';
-		$output .= esc_html__( 'If the referral amount should be calculated based on the form total, input the rate to be used.', 'affiliates-caldera-forms' );
-		$output .= '<br />';
-		$output .= esc_html__( 'For example, use 0.1 to grant a commission of 10%. Leave this empty if a fixed commission should be granted.', 'affiliates-caldera-forms' );
-		$output .= '</p>';
-		$output .= '</div>';
-		$output .= '</div>';
 		// @codingStandardsIgnoreStart
 		echo $output;
 		// @codingStandardsIgnoreEnd
 	}
-
 } Affiliates_Cf_Form_Settings::init();
