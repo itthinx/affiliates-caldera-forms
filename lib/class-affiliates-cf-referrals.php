@@ -45,7 +45,7 @@ class Affiliates_Cf_Referrals {
 	 */
 	public static function caldera_forms_submit_complete( $form, $referrer, $process_id, $entryid ) {
 		$affiliate_ids = null;
-		$options = get_option( $form['ID'] , array() );
+		$options = get_option( $form['ID'], array() );
 		$enable_form_referrals = isset( $options['affiliates_cf']['enable_form_referrals' ] ) ? $options['affiliates_cf']['enable_form_referrals'] : null;
 
 		if ( $enable_form_referrals ) {
@@ -55,8 +55,9 @@ class Affiliates_Cf_Referrals {
 			}
 
 			$post_id         = $_POST[ '_cf_cr_pst' ] ? absint( $_POST[ '_cf_cr_pst' ] ) : $form['ID'];
-			$description     = sprintf( __( 'Caldera Forms #%d', 'affiliates-caldera-forms' ), $form['name'] );
+			$description     = sprintf( __( 'Caldera Forms #%s', 'affiliates-caldera-forms' ), $form['name'] );
 			$currency        = apply_filters( 'affiliates_cf_currency', 'USD' );
+			// @todo We need to take referral_rate into account if applicable
 			$referral_amount = isset( $options['affiliates_cf']['referral_amount'] ) ? $options['affiliates_cf']['referral_amount'] : 0;
 			$default_status  = get_option( 'aff_default_referral_status', AFFILIATES_REFERRAL_STATUS_ACCEPTED );
 			$status          = isset( $options['affiliates_cf']['referral_status' ] ) ? $options['affiliates_cf']['referral_status'] : $default_status;
@@ -64,13 +65,17 @@ class Affiliates_Cf_Referrals {
 
 			$data = array(
 				'form_id' => array(
-					'title' => 'Caldera Forms Submission #',
+					'title'  => 'Caldera Forms Submission #',
 					'domain' => 'affiliates-caldera-forms',
-					'value' => esc_sql( $form['name'] )
+					'value'  => esc_sql( $form['name'] )
 				)
 			);
 
-			if ( class_exists( 'Affiliates_Referral_Controller' ) ) {
+			if (
+				defined( ACF_LIB ) &&
+				ACF_LIB == 'lib' &&
+				class_exists( 'Affiliates_Referral_Controller' )
+			) {
 				$referrer_params = array();
 				$rc = new Affiliates_Referral_Controller();
 
@@ -99,13 +104,13 @@ class Affiliates_Cf_Referrals {
 						}
 						if ( $form['ID'] ) {
 							$referral_items = array();
-							$rate_id   = null;
-							$object_id = null;
-							$term_ids  = null;
+							$rate_id        = null;
+							$object_id      = null;
+							$term_ids       = null;
 							if ( $post_id ) {
 								$object_id = $post_id;
 								$em_categories = null;
-								$term_ids = null;
+								$term_ids      = null;
 							}
 							if ( $rate = $rc->seek_rate(
 								array(
@@ -117,7 +122,7 @@ class Affiliates_Cf_Referrals {
 								)
 							) ) {
 								$rate_id = $rate->rate_id;
-								$type = 'form';//write_log($rate->value);
+								$type = 'form';
 								if ( $referral_amount > 0 ) {
 									switch ( $rate->type ) {
 										case AFFILIATES_PRO_RATES_TYPE_AMOUNT :
